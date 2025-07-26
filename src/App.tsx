@@ -1,49 +1,33 @@
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import { invoke } from '@tauri-apps/api/core';
 import './App.css';
-import { Button } from './components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
+import { Welcome, Playground } from './pages';
 
 function App() {
-	const [greetMsg, setGreetMsg] = useState('');
-	const [name, setName] = useState('');
-
-	async function greet() {
-		// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-		setGreetMsg(await invoke('greet', { name }));
-	}
+	const [activeTab, setActiveTab] = useState('welcome');
 
 	return (
-		<main className="flex flex-col items-center justify-center h-screen gap-4">
-			<h1>Welcome to Tauri + React</h1>
+		<div className="dark h-screen flex flex-col bg-background text-foreground">
+			<Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+				{/* Панель табов в верхней части */}
+				<TabsList className="grid w-full grid-cols-2 h-12 bg-card">
+					<TabsTrigger value="welcome" className="text-sm font-medium">
+						Welcome
+					</TabsTrigger>
+					<TabsTrigger value="playground" className="text-sm font-medium">
+						Playground
+					</TabsTrigger>
+				</TabsList>
 
-			<div className="row">
-				<a href="https://vitejs.dev" target="_blank">
-					<img src="/vite.svg" className="logo vite" alt="Vite logo" />
-				</a>
-				<a href="https://tauri.app" target="_blank">
-					<img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-				</a>
-				<a href="https://reactjs.org" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
-			</div>
-			<p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-			<Button>shadcn/ui button</Button>
-
-			<form
-				className="row"
-				onSubmit={e => {
-					e.preventDefault();
-					greet();
-				}}
-			>
-				<input id="greet-input" onChange={e => setName(e.currentTarget.value)} placeholder="Enter a name..." />
-				<button type="submit">Greet</button>
-			</form>
-			<p>{greetMsg}</p>
-		</main>
+				{/* Контент табов */}
+				<TabsContent value="welcome" className="flex-1 m-0">
+					<Welcome />
+				</TabsContent>
+				<TabsContent value="playground" className="flex-1 m-0">
+					<Playground />
+				</TabsContent>
+			</Tabs>
+		</div>
 	);
 }
 
