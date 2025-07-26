@@ -1,2 +1,2 @@
-# qyp-mini
-AI-agent for SQL databases with generative UI
+# qYp mini app
+AI-agent for SQL databases with generative UI. A little open source brother for qyp.ai.
