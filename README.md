@@ -6,7 +6,7 @@
 
 🤖 AI-agent for SQL databases with generative UI. A little open source brother for [qyp.ai](https://qyp.ai).
 
-<img src="assets/pg-screen.png" alt="qYp-mini screenshot" width="600"/>
+<img src="assets/gh-screen.png" alt="qYp-mini screenshot" width="600"/>
 
 </div>
 
