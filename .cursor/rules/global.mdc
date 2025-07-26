@@ -1,0 +1,69 @@
+---
+alwaysApply: true
+---
+
+# qYp-mini Architecture Guidelines
+
+## Project Overview
+
+qYp-mini is an AI-agent for SQL databases with generative UI capabilities, built as a desktop application using Tauri. The application enables users to interact with databases through natural language, generating SQL queries and React components dynamically.
+
+## Architecture
+
+### Technology Stack
+
+- **Package Manager**: pnpm
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS v4, shadcn/ui
+- **Desktop Framework**: Tauri v2 (Rust-based)
+- **Backend**:
+    - Tauri Rust backend for native OS integration
+    - Node.js TypeScript backend (compiled to self-executable binary)
+- **UI Components**: shadcn/ui with Radix UI primitives
+
+### Core Principles
+
+- **Separation of Concerns**: Clear boundaries between UI, business logic, and data layers
+- **Plugin Architecture**: Extensible system for database adapters and UI components
+- **Security First**: Sandboxed execution for generated components
+- **Modular Design**: Loosely coupled modules for maintainability
+
+### Directory Structure
+
+```
+qyp-mini/                         # Root directory, we are here
+├── src/                          # Frontend React application
+│   ├── components/
+│   │   ├── ui/                   # Base UI components (shadcn)
+│   │   ├── chat/                 # Chat interface components
+│   │   │   ├── ChatPanel.tsx
+│   │   │   ├── MessageList.tsx
+│   │   │   └── MessageInput.tsx
+│   │   ├── dashboard/            # Dashboard components
+│   │   │   ├── DashboardGrid.tsx
+│   │   │   ├── WidgetContainer.tsx
+│   │   │   └── WidgetRegistry.tsx
+│   ├── features/                 # Feature-based modules
+│   │   ├── ai-agent/
+│   │   │   ├── hooks/
+│   │   │   ├── services/
+│   │   │   └── types/
+│   │   ├── database/
+│   │   │   ├── connections/
+│   │   │   ├── query-builder/
+│   │   │   └── schema-analyzer/
+│   │   └── code-generation/
+│   │       ├── compiler/
+│   │       ├── sandbox/
+│   │       └── templates/
+│   ├── lib/                      # Shared utilities
+│   │   ├── ipc/                  # Tauri IPC utilities
+│   │   ├── runtime-compiler/     # TSX compilation
+│   │   └── state/                # State management
+│   ├── store/                    # Global state (Zustand/Jotai)
+│   └── types/                    # TypeScript definitions
+├── src-tauri/                    # Tauri Rust backend, managed by Tauri, we don't touch it
+├── src-node/                     # Node.js backend
+│   ├── compiler/                 # Component compilation
+└── shared/                       # Shared types between all layers
+    └── types/
+```

@@ -1,0 +1,30 @@
+{
+	"name": "qyp-mini-node-backend",
+	"version": "0.1.0",
+	"description": "Node.js sidecar для qYp-mini",
+	"type": "module",
+	"main": "index.js",
+	"scripts": {
+		"build-code": "tsc",
+		"build-binary": "pnpm run build-code && pkg dist/index.js --output qyp-mini-node-backend",
+		"package-binary": "node scripts/build.js qyp-mini-node-backend",
+		"build": "pnpm run build-binary && pnpm run package-binary"
+	},
+	"devDependencies": {
+		"@yao-pkg/pkg": "^5.15.0"
+	},
+	"bin": {
+		"qyp-mini-node-backend": "index.js"
+	},
+	"pkg": {
+		"targets": [
+			"latest-macos"
+		],
+		"scripts": [
+			"index.js"
+		]
+	},
+	"dependencies": {
+		"@tiny-utils/bytes": "^1.1.0"
+	}
+}
