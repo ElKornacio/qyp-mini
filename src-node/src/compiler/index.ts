@@ -1,6 +1,7 @@
 import { CompileComponentResponse } from '../types';
 import { SerializedVirtualNode } from '../virtual-fs/types';
 import { VirtualFS } from '../virtual-fs/VirtualFS';
+import { ESBuildCompiler } from './esbuild-compiler';
 
 /**
  * Virtual directory structure:
@@ -15,20 +16,35 @@ import { VirtualFS } from '../virtual-fs/VirtualFS';
  */
 
 export class Compiler {
-	constructor() {}
+	private esbuildCompiler: ESBuildCompiler;
+
+	constructor() {
+		this.esbuildCompiler = new ESBuildCompiler();
+	}
 
 	async compile(serializedVfs: SerializedVirtualNode[], entryPoint: string): Promise<CompileComponentResponse> {
 		const vfs = new VirtualFS();
 		vfs.deserialize(serializedVfs);
 
-		// const result = await vfs.compile(entryPoint);
+		try {
+			// Компилируем используя ESBuild
+			const result = await this.esbuildCompiler.compile(vfs, entryPoint, {
+				minify: false,
+			});
 
-		const entryPointFile = vfs.readFile(entryPoint);
-		const entryPointSource = entryPointFile.content;
+			return {
+				jsBundle: result.code,
+				cssBundle: '', // CSS пока не извлекаем отдельно
+			};
+		} catch (error) {
+			// В случае ошибки возвращаем исходный код для отладки
+			const entryPointFile = vfs.readFile(entryPoint);
+			const entryPointSource = entryPointFile.content;
 
-		return {
-			jsBundle: `// mocking compilation, original source code:\n\n${entryPointSource}`,
-			cssBundle: '/* mock-css-bundle */',
-		};
+			return {
+				jsBundle: `// Ошибка компиляции: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}\n\n// Исходный код:\n\n${entryPointSource}`,
+				cssBundle: '/* Ошибка компиляции CSS */',
+			};
+		}
 	}
 }

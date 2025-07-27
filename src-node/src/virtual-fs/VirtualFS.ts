@@ -80,6 +80,14 @@ export class VirtualFS {
 		return file;
 	}
 
+	readFileMetadata(path: string): VirtualFileMetadata {
+		const file = this.filesNodes.get(path);
+		if (!file) {
+			throw new Error(`File ${path} not found`);
+		}
+		return file.metadata;
+	}
+
 	readDirectory(path: string): VirtualNode[] {
 		const directory = this.directoriesNodes.get(path);
 		if (!directory) {
