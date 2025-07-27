@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import svgr from 'vite-plugin-svgr';
 import tailwindcss from '@tailwindcss/vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -15,6 +16,7 @@ export default defineConfig(async () => ({
 		tsconfigPaths(),
 		svgr(),
 		tailwindcss(),
+		nodePolyfills(),
 	],
 
 	// Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

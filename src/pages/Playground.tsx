@@ -3,6 +3,17 @@ import { Textarea } from '../components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { QypSidecar } from '../lib/sidecar';
+import { buildDefaultFS } from '@/virtual-fs/default-fs';
+
+async function compileCodeViaNodejsSidecar(indexTsxContent: string): Promise<string> {
+	const vfs = await buildDefaultFS(indexTsxContent);
+
+	const serialized = vfs.serialize();
+
+	const result = await QypSidecar.compile(serialized, '/src/widget/index.tsx');
+
+	return result.jsBundle;
+}
 
 export function Playground() {
 	const [code, setCode] = useState(`import { Button } from  '@/components/ui/button';
@@ -32,9 +43,9 @@ export default function MyComponent() {
 		setCompilationError('');
 
 		try {
-			const result = await QypSidecar.compile(code);
+			const result = await compileCodeViaNodejsSidecar(code);
 
-			setCompiledCode(result.compiledCode || '');
+			setCompiledCode(result || '');
 			setCompilationError('');
 		} catch (error) {
 			setCompilationError(error instanceof Error ? error.message : 'Ошибка при обращении к sidecar');

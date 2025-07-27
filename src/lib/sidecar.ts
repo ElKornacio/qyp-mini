@@ -1,23 +1,6 @@
 import { SidecarExecutor } from './SidecarExecutor';
-import { BaseRequest, BaseResponse } from 'src-node/src/ipc/types';
-
-export interface PingRequest extends BaseRequest {
-	message: string;
-}
-
-export interface PingResponse {
-	message: string;
-}
-
-export interface CompileComponentRequest extends BaseRequest {
-	code: string;
-}
-
-export interface CompileComponentResponse {
-	compiled?: boolean;
-	component?: string;
-	compiledCode: string;
-}
+import { SerializedVirtualNode } from 'src-node/src/virtual-fs/types';
+import { CompileComponentRequest, CompileComponentResponse, PingRequest, PingResponse } from 'src-node/src/types';
 
 /**
  * Класс для работы с Node.js sidecar
@@ -46,11 +29,15 @@ export class QypSidecar {
 	 * @param code - TSX/React код для компиляции
 	 * @returns Результат компиляции
 	 */
-	static async compile(code: string): Promise<CompileComponentResponse> {
+	static async compile(
+		serializedVFS: SerializedVirtualNode[],
+		entryPoint: string,
+	): Promise<CompileComponentResponse> {
 		// Подготавливаем запрос для компиляции
 		const request: CompileComponentRequest = {
 			command: 'compile',
-			code: code,
+			serializedVFS,
+			entryPoint,
 		};
 
 		// Выполняем команду через sidecar

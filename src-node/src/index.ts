@@ -1,6 +1,6 @@
 import { BaseResponse, CommandHandler, IPCProtocol } from './ipc/index.js';
 import { CompileCommandHandler } from './request-handler/index.js';
-import { CompileRequest, CompileResult } from './types/index.js';
+import { CompileComponentRequest, CompileComponentResponse } from './types/index.js';
 
 /**
  * Обработчик команды ping для проверки работоспособности
@@ -19,7 +19,7 @@ async function main(): Promise<void> {
 	const compileHandler = new CompileCommandHandler();
 
 	// Регистрируем команду compile
-	commandHandler.registerCommand<CompileRequest, CompileResult>('compile', async request => {
+	commandHandler.registerCommand<CompileComponentRequest, CompileComponentResponse>('compile', async request => {
 		return await compileHandler.handle(request);
 	});
 

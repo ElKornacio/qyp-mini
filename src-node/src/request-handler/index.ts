@@ -1,4 +1,4 @@
-import { CompileRequest, CompileResult } from '../types/index.js';
+import { CompileComponentRequest, CompileComponentResponse } from '../types/index.js';
 import { createError } from '../utils/index.js';
 import { Compiler } from '../compiler/index.js';
 
@@ -15,19 +15,14 @@ export class CompileCommandHandler {
 	/**
 	 * Обрабатывает запрос на компиляцию
 	 */
-	async handle(request: CompileRequest): Promise<CompileResult> {
+	async handle(request: CompileComponentRequest): Promise<CompileComponentResponse> {
 		try {
-			// Валидация запроса
-			if (!request.files || !Array.isArray(request.files)) {
-				throw createError('Отсутствуют файлы для компиляции');
-			}
-
-			if (request.files.length === 0) {
+			if (request.serializedVFS.length === 0) {
 				throw createError('Массив файлов пуст');
 			}
 
 			// Компиляция
-			const result = await this.compiler.compile(request.files, request.options);
+			const result = await this.compiler.compile(request.serializedVFS, request.entryPoint);
 
 			return result;
 		} catch (error) {
