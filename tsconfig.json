@@ -26,6 +26,6 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true
 	},
-	"include": ["src", "src-node/src/virtual-fs/VirtualFS.ts"],
+	"include": ["src", "src/virtual-fs/VirtualFS.ts"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }

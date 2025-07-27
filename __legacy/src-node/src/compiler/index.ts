@@ -1,7 +1,8 @@
-import { CompileComponentResponse } from '../types';
-import { SerializedVirtualNode } from '../virtual-fs/types';
-import { VirtualFS } from '../virtual-fs/VirtualFS';
-import { ESBuildCompiler } from './esbuild-compiler';
+import { CompileComponentResponse } from '../types/index.js';
+import { SerializedVirtualNode } from '../../../src/virtual-fs/types.js';
+import { VirtualFS } from '../../../src/virtual-fs/VirtualFS.js';
+import { ESBuildCompiler } from './esbuild-compiler.js';
+// import { TailwindCompiler } from './tailwind-compiler.js';
 
 /**
  * Virtual directory structure:
@@ -17,9 +18,11 @@ import { ESBuildCompiler } from './esbuild-compiler';
 
 export class Compiler {
 	private esbuildCompiler: ESBuildCompiler;
+	// private tailwindCompiler: TailwindCompiler;
 
 	constructor() {
 		this.esbuildCompiler = new ESBuildCompiler();
+		// this.tailwindCompiler = new TailwindCompiler();
 	}
 
 	async compile(serializedVfs: SerializedVirtualNode[], entryPoint: string): Promise<CompileComponentResponse> {
@@ -32,9 +35,14 @@ export class Compiler {
 				minify: false,
 			});
 
+			// const tailwindResult = await this.tailwindCompiler.compile(vfs, {
+			// 	minify: false,
+			// });
+
 			return {
 				jsBundle: result.code,
-				cssBundle: '', // CSS пока не извлекаем отдельно
+				cssBundle: '',
+				// cssBundle: tailwindResult.css,
 			};
 		} catch (error) {
 			// В случае ошибки возвращаем исходный код для отладки

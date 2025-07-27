@@ -9,17 +9,6 @@
 		"core:window:allow-set-size",
 		"core:window:allow-center",
 		"opener:default",
-		{
-			"identifier": "shell:allow-spawn",
-			"allow": [
-				{
-					"name": "binaries/qyp-mini-node-backend",
-					"cmd": "binaries/qyp-mini-node-backend",
-					"args": true,
-					"sidecar": true
-				}
-			]
-		},
 		"shell:allow-stdin-write",
 		"shell:default"
 	]

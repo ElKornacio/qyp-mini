@@ -4,14 +4,15 @@
 	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
-		"dev": "cd src-node && pnpm run build && cd .. && vite",
-		"build": "cd src-node && pnpm run build && cd .. && tsc && vite build",
+		"dev": "vite",
+		"build": "tsc && vite build",
 		"preview": "vite preview",
 		"tauri": "tauri"
 	},
 	"dependencies": {
 		"@radix-ui/react-slot": "^1.2.3",
 		"@radix-ui/react-tabs": "^1.1.12",
+		"@tailwindcss/oxide": "^4.1.11",
 		"@tailwindcss/vite": "^4.1.11",
 		"@tauri-apps/api": "^2",
 		"@tauri-apps/plugin-opener": "^2",
@@ -19,11 +20,14 @@
 		"@tiny-utils/bytes": "^1.1.0",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
+		"esbuild-wasm": "^0.25.8",
+		"lightningcss-wasm": "^1.30.1",
 		"lucide-react": "^0.525.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"tailwind-merge": "^3.3.1",
-		"tailwindcss": "^4.1.11"
+		"tailwindcss": "^4.1.11",
+		"tailwindcss-v3": "npm:tailwindcss@^3.4.17"
 	},
 	"devDependencies": {
 		"@tauri-apps/cli": "^2",

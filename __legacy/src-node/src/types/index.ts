@@ -1,5 +1,5 @@
 import { BaseRequest } from '../ipc/index.js';
-import { SerializedVirtualNode } from '../virtual-fs/types.js';
+import { SerializedVirtualNode } from '../../../src/virtual-fs/types.js';
 
 export interface PingRequest extends BaseRequest {
 	message: string;

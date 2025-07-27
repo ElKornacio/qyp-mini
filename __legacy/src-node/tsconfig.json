@@ -12,5 +12,5 @@
 		"strictNullChecks": true,
 		"skipLibCheck": true
 	},
-	"include": ["./src"]
+	"include": ["./src", "../src/virtual-fs/VirtualFS.ts", "../src/virtual-fs/types.ts"]
 }

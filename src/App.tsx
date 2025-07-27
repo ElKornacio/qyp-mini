@@ -10,7 +10,7 @@ function App() {
 		<div className="dark h-screen flex flex-col bg-background text-foreground">
 			<Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
 				{/* Панель табов в верхней части */}
-				<TabsList className="grid w-full grid-cols-2 h-12 bg-card">
+				<TabsList className="grid w-full grid-cols-3 h-12 bg-card">
 					<TabsTrigger value="welcome" className="text-sm font-medium">
 						Welcome
 					</TabsTrigger>

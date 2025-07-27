@@ -1,8 +1,8 @@
 import * as esbuild from 'esbuild';
 
-import { VirtualFS } from '../virtual-fs/VirtualFS';
-import { createError } from '../utils';
-import { ESBuildVFS } from './esbuild-vfs';
+import { VirtualFS } from '../../../src/virtual-fs/VirtualFS.js';
+import { createError } from '../utils/index.js';
+import { ESBuildVFS } from './esbuild-vfs.js';
 
 interface CompileOptions {
 	minify?: boolean;

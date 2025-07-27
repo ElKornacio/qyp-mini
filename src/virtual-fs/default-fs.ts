@@ -1,4 +1,4 @@
-import { VirtualFS } from 'src-node/src/virtual-fs/VirtualFS';
+import { VirtualFS } from '@/virtual-fs/VirtualFS';
 import { buildShadcnUiFS } from './shadcn-ui';
 
 /**

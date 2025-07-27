@@ -2,20 +2,30 @@ import { useRef, useState } from 'react';
 import { Textarea } from '../components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { QypSidecar } from '../lib/sidecar';
 import { buildDefaultFS, getDefaultWidgetQuerySqlTsContent } from '@/virtual-fs/default-fs';
 import { tryToMockGlobalModule } from '@/pipeline/modules-mocks/mockGlobalModules';
 import { tryToMockShadcnUiModules } from '@/pipeline/modules-mocks/mockShadcnUiModules';
 import { tryToMockUtilsModule } from '@/pipeline/modules-mocks/mockUtilsModule';
+import { TailwindCompiler } from '@/lib/compiler/TailwindCompiler';
+import { ESBuildCompiler } from '@/lib/compiler/ESBuildCompiler';
 
-async function compileCodeToBundleViaNodejsSidecar(indexTsxContent: string): Promise<string> {
+async function compileCodeToBundleViaNodejsSidecar(
+	indexTsxContent: string,
+): Promise<{ jsBundle: string; cssBundle: string }> {
 	const vfs = await buildDefaultFS(indexTsxContent, getDefaultWidgetQuerySqlTsContent());
 
-	const serialized = vfs.serialize();
+	const esbuildCompiler = new ESBuildCompiler();
+	const tailwindCompiler = new TailwindCompiler();
 
-	const result = await QypSidecar.compile(serialized, '/src/widget/index.tsx');
+	const [jsBundle, cssBundle] = await Promise.all([
+		esbuildCompiler.compile(vfs, '/src/widget/index.tsx'),
+		tailwindCompiler.compile(vfs),
+	]);
 
-	return result.jsBundle;
+	return {
+		jsBundle,
+		cssBundle,
+	};
 }
 
 async function compileBundleToComponent(code: string) {
@@ -97,12 +107,14 @@ export default function MyComponent() {
 		try {
 			const result = await compileCodeToBundleViaNodejsSidecar(code);
 
-			const component = await compileBundleToComponent(result);
+			const component = await compileBundleToComponent(result.jsBundle);
+
+			console.log('result.css: ', result.cssBundle);
 
 			BuiltComponentRef.current = component;
 			setBuiltComponentTicker(prev => prev + 1);
 
-			setCompiledCode(result || '');
+			setCompiledCode(result.jsBundle || '');
 			setCompilationError('');
 		} catch (error) {
 			setCompilationError(error instanceof Error ? error.message : 'Ошибка при обращении к sidecar');

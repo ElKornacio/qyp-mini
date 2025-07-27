@@ -62,7 +62,6 @@ qyp-mini/                         # Root directory, we are here
 │   ├── store/                    # Global state (Zustand/Jotai)
 │   └── types/                    # TypeScript definitions
 ├── src-tauri/                    # Tauri Rust backend, managed by Tauri, we don't touch it
-├── src-node/                     # Node.js backend
 │   ├── compiler/                 # Component compilation
 └── shared/                       # Shared types between all layers
     └── types/

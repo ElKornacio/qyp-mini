@@ -2,16 +2,20 @@
 	"name": "qyp-mini-node-backend",
 	"version": "0.1.0",
 	"description": "Node.js sidecar для qYp-mini",
-	"type": "module",
+	"type": "commonjs",
 	"main": "dist/index.js",
 	"scripts": {
-		"build-code": "tsc",
+		"build-code": "rm -rf ./dist && tsc",
 		"build-binary": "pnpm run build-code && pkg dist/index.js --output qyp-mini-node-backend",
+		"build-test": "pnpm run build-code && pkg dist/test.js --output qyp-mini-node-test-backend",
 		"package-binary": "node scripts/build.js qyp-mini-node-backend",
-		"build": "pnpm run build-binary && pnpm run package-binary"
+		"build": "pnpm run build-binary && pnpm run package-binary",
+		"test": "tsx src/test.ts",
+		"pkg-test": "pnpm run build-test && ./qyp-mini-node-test-backend"
 	},
 	"devDependencies": {
-		"@yao-pkg/pkg": "^5.15.0"
+		"@yao-pkg/pkg": "^5.15.0",
+		"tsx": "^4.20.3"
 	},
 	"bin": {
 		"qyp-mini-node-backend": "dist/index.js"
@@ -25,6 +29,8 @@
 		]
 	},
 	"dependencies": {
+		"@tailwindcss/node": "^4.1.11",
+		"@tailwindcss/oxide": "^4.1.11",
 		"@tailwindcss/postcss": "^4.1.11",
 		"@tiny-utils/bytes": "^1.1.0",
 		"esbuild": "^0.25.8",

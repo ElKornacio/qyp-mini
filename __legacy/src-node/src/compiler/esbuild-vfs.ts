@@ -1,8 +1,8 @@
 import path from 'path';
 import { PluginBuild, Loader, OnLoadArgs, OnResolveArgs } from 'esbuild';
 
-import { createError } from '../utils';
-import { VirtualFS } from '../virtual-fs/VirtualFS';
+import { createError } from '../utils/index.js';
+import { VirtualFS } from '../../../src/virtual-fs/VirtualFS.js';
 
 export class ESBuildVFS {
 	name = 'virtual-files';

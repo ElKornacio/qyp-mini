@@ -1,5 +1,5 @@
 import { SidecarExecutor } from './SidecarExecutor';
-import { SerializedVirtualNode } from 'src-node/src/virtual-fs/types';
+import { SerializedVirtualNode } from '@/virtual-fs/types';
 import { CompileComponentRequest, CompileComponentResponse, PingRequest, PingResponse } from 'src-node/src/types';
 
 /**
@@ -39,6 +39,8 @@ export class QypSidecar {
 			serializedVFS,
 			entryPoint,
 		};
+
+		console.log('request', JSON.stringify(request));
 
 		// Выполняем команду через sidecar
 		const response = await SidecarExecutor.execute<CompileComponentResponse>({

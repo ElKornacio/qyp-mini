@@ -9,9 +9,9 @@ import {
 } from './types';
 
 export class VirtualFS {
-	private readonly directoriesNodes: Map<string, VirtualDirectory> = new Map();
-	private readonly directoriesChildren: Map<string, VirtualNode[]> = new Map();
-	private readonly filesNodes: Map<string, VirtualFile> = new Map();
+	readonly directoriesNodes: Map<string, VirtualDirectory> = new Map();
+	readonly directoriesChildren: Map<string, VirtualNode[]> = new Map();
+	readonly filesNodes: Map<string, VirtualFile> = new Map();
 
 	constructor() {
 		this.directoriesNodes.set('/', { name: '', type: 'directory', metadata: {} });

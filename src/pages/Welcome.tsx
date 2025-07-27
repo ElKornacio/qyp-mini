@@ -3,7 +3,6 @@ import { Search, Mic, Send, Key, Database, Shuffle, Settings } from 'lucide-reac
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { QypSidecar } from '@/lib/sidecar';
 
 export function Welcome() {
 	const [query, setQuery] = useState('');
@@ -19,10 +18,7 @@ export function Welcome() {
 		e.preventDefault();
 		// Обработка поискового запроса
 		console.log('Search query:', query);
-		QypSidecar.ping(query).then(res => {
-			setQuery('Response: ' + res.message);
-			console.log('Sidecar response:', res);
-		});
+		setQuery('Response: ' + query);
 	};
 
 	return (
