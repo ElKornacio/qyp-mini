@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Textarea } from '../components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { QypSidecar } from '../lib/sidecar';
 import { buildDefaultFS, getDefaultWidgetQuerySqlTsContent } from '@/virtual-fs/default-fs';
+import { tryToMockGlobalModule } from '@/pipeline/modules-mocks/mockGlobalModules';
+import { tryToMockShadcnUiModules } from '@/pipeline/modules-mocks/mockShadcnUiModules';
+import { tryToMockUtilsModule } from '@/pipeline/modules-mocks/mockUtilsModule';
 
-async function compileCodeViaNodejsSidecar(indexTsxContent: string): Promise<string> {
+async function compileCodeToBundleViaNodejsSidecar(indexTsxContent: string): Promise<string> {
 	const vfs = await buildDefaultFS(indexTsxContent, getDefaultWidgetQuerySqlTsContent());
 
 	const serialized = vfs.serialize();
@@ -15,9 +18,40 @@ async function compileCodeViaNodejsSidecar(indexTsxContent: string): Promise<str
 	return result.jsBundle;
 }
 
+async function compileBundleToComponent(code: string) {
+	const wrappedIIFE = `(function(module, require) {
+		${code}
+	})(__module__, __require__)`;
+
+	const executeModule = new Function('__module__', '__require__', wrappedIIFE);
+
+	const context: any = {
+		// на будущее
+	};
+
+	const customModule: any = { exports: {} };
+
+	const customRequire = (path: string) => {
+		let resolvedModule: any;
+		if ((resolvedModule = tryToMockGlobalModule(context, path))) {
+			return resolvedModule;
+		} else if ((resolvedModule = tryToMockShadcnUiModules(context, path))) {
+			return resolvedModule;
+		} else if ((resolvedModule = tryToMockUtilsModule(context, path))) {
+			return resolvedModule;
+		}
+
+		throw new Error(`Module ${path} not found`);
+	};
+
+	executeModule(customModule, customRequire);
+
+	return customModule.exports.default;
+}
+
 export function Playground() {
 	const [code, setCode] = useState(`
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from  '@/components/ui/button';
 import fetchUsersCount from '@/widget/query.sql';
 		
@@ -47,6 +81,8 @@ export default function MyComponent() {
 	const [compiledCode, setCompiledCode] = useState<string>('');
 	const [isCompiling, setIsCompiling] = useState(false);
 	const [compilationError, setCompilationError] = useState<string>('');
+	const BuiltComponentRef = useRef<React.FunctionComponent<{}> | null>(null);
+	const [builtComponentTicker, setBuiltComponentTicker] = useState(0);
 
 	// Функция для компиляции кода через sidecar
 	const compileCode = async () => {
@@ -59,7 +95,12 @@ export default function MyComponent() {
 		setCompilationError('');
 
 		try {
-			const result = await compileCodeViaNodejsSidecar(code);
+			const result = await compileCodeToBundleViaNodejsSidecar(code);
+
+			const component = await compileBundleToComponent(result);
+
+			BuiltComponentRef.current = component;
+			setBuiltComponentTicker(prev => prev + 1);
 
 			setCompiledCode(result || '');
 			setCompilationError('');
@@ -134,7 +175,8 @@ export default function MyComponent() {
 				<CardHeader>
 					<CardTitle className="text-foreground">{compiledCode ? 'Компилированный код' : 'Превью'}</CardTitle>
 				</CardHeader>
-				<CardContent>{renderPreview()}</CardContent>
+				<CardContent>Component: {BuiltComponentRef.current ? <BuiltComponentRef.current /> : null}</CardContent>
+				<CardContent>Code: {renderPreview()}</CardContent>
 			</Card>
 		</div>
 	);

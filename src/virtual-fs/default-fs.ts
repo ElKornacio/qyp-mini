@@ -32,7 +32,7 @@ export const getDefaultWidgetQuerySqlTsContent = () => `import { runSql } from '
  */
 
 export default async function fetchUsersCount() {
-    return await runSql<{ count: number }[]>(sql\`SELECT COUNT(*) as count FROM users\`);
+    return await runSql<{ count: number }[]>(\`SELECT COUNT(*) as count FROM users\`);
 }
 `;
 

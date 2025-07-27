@@ -15,11 +15,7 @@ export class ESBuildCompiler {
 	/**
 	 * Компилирует виртуальные файлы в JavaScript
 	 */
-	async compile(
-		vfs: VirtualFS,
-		entryPoint: string,
-		options: CompileOptions = {},
-	): Promise<{ code: string; sourcemap?: string }> {
+	async compile(vfs: VirtualFS, entryPoint: string, options: CompileOptions = {}): Promise<{ code: string }> {
 		// Проверяем существование entry point
 		if (!vfs.fileExists(entryPoint)) {
 			throw createError(`Не найдена входная точка: ${entryPoint}`);
@@ -32,7 +28,7 @@ export class ESBuildCompiler {
 				entryPoints: [entryPoint],
 				bundle: true,
 				write: false,
-				format: 'iife',
+				format: 'cjs',
 				target: 'es2020',
 				jsx: 'automatic',
 				minify: options.minify || false,
@@ -54,7 +50,6 @@ export class ESBuildCompiler {
 
 			return {
 				code: outputFile.text,
-				sourcemap: result.outputFiles?.[1]?.text,
 			};
 		} catch (error) {
 			throw createError('Ошибка компиляции с ESBuild', error);
