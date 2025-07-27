@@ -5,11 +5,14 @@ import { Button } from '../components/ui/button';
 import { QypSidecar } from '../lib/sidecar';
 
 export function Playground() {
-	const [code, setCode] = useState(`function MyComponent() {
+	const [code, setCode] = useState(`import { Button } from  '@/components/ui/button';
+		
+export default function MyComponent() {
   return (
     <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-lg">
       <h2 className="text-lg font-bold text-blue-800 dark:text-blue-200">Hello from Playground!</h2>
       <p className="text-blue-600 dark:text-blue-300">Edit the code on the left to see changes here.</p>
+	  <Button>Click me!</Button>
     </div>
   );
 }`);
@@ -31,13 +34,8 @@ export function Playground() {
 		try {
 			const result = await QypSidecar.compile(code);
 
-			if (result.status === 'success') {
-				setCompiledCode(result.compiledCode || '');
-				setCompilationError('');
-			} else {
-				setCompilationError(result.message || 'Неизвестная ошибка компиляции');
-				setCompiledCode('');
-			}
+			setCompiledCode(result.compiledCode || '');
+			setCompilationError('');
 		} catch (error) {
 			setCompilationError(error instanceof Error ? error.message : 'Ошибка при обращении к sidecar');
 			setCompiledCode('');
@@ -52,7 +50,7 @@ export function Playground() {
 			return (
 				<div className="p-4 bg-destructive/10 rounded-lg border border-destructive/20">
 					<h3 className="text-sm font-medium mb-2 text-destructive">Ошибка компиляции</h3>
-					<p className="text-destructive text-sm">{compilationError}</p>
+					<p className="text-destructive text-sm whitespace-pre-wrap">{compilationError}</p>
 				</div>
 			);
 		}

@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "cd src-node && pnpm run build && cd .. && vite",
-		"build": "tsc && vite build",
+		"build": "cd src-node && pnpm run build && cd .. && tsc && vite build",
 		"preview": "vite preview",
 		"tauri": "tauri"
 	},

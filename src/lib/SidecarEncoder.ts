@@ -1,18 +1,5 @@
 import { SmartBuffer } from '@tiny-utils/bytes';
-
-// Типы для запросов к sidecar
-export interface SidecarRequest {
-	command: string;
-	code?: string;
-	[key: string]: any;
-}
-
-// Типы для ответов от sidecar
-export interface SidecarResponse {
-	status: 'success' | 'error';
-	message?: string;
-	timestamp: string;
-}
+import { BaseRequest, BaseResponse } from '../../src-node/src/ipc/types';
 
 /**
  * Утилиты для кодирования/декодирования запросов и ответов sidecar
@@ -23,7 +10,7 @@ export class SidecarEncoder {
 	 * @param request - JSON объект запроса
 	 * @returns Закодированная строка
 	 */
-	static encodeRequest(request: SidecarRequest): string {
+	static encodeRequest(request: BaseRequest): string {
 		const jsonString = JSON.stringify(request);
 		const base64String = SmartBuffer.ofUTF8String(jsonString).toBase64String();
 		return base64String + '\n';
@@ -34,7 +21,7 @@ export class SidecarEncoder {
 	 * @param base64Response - base64 строка ответа
 	 * @returns Декодированный JSON объект
 	 */
-	static decodeResponse(base64Response: string): any {
+	static decodeResponse<T = any>(base64Response: string): BaseResponse<T> {
 		try {
 			const jsonString = SmartBuffer.ofBase64String(base64Response.trim()).toUTF8String();
 			return JSON.parse(jsonString);

@@ -20,7 +20,7 @@ export function Welcome() {
 		// Обработка поискового запроса
 		console.log('Search query:', query);
 		QypSidecar.ping(query).then(res => {
-			setQuery('Response: ' + res);
+			setQuery('Response: ' + res.message);
 			console.log('Sidecar response:', res);
 		});
 	};

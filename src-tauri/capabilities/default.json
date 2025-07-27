@@ -7,17 +7,6 @@
 		"core:default",
 		"opener:default",
 		{
-			"identifier": "shell:allow-execute",
-			"allow": [
-				{
-					"name": "binaries/qyp-mini-node-backend",
-					"cmd": "binaries/qyp-mini-node-backend",
-					"args": true,
-					"sidecar": true
-				}
-			]
-		},
-		{
 			"identifier": "shell:allow-spawn",
 			"allow": [
 				{

@@ -1,12 +1,13 @@
 import { Command, TerminatedPayload } from '@tauri-apps/plugin-shell';
-import { SidecarEncoder, SidecarRequest, SidecarResponse } from './SidecarEncoder';
+import { SidecarEncoder } from './SidecarEncoder';
+import { BaseRequest, BaseResponse } from 'src-node/src/ipc/types';
 
 /**
  * Параметры для выполнения команды sidecar
  */
 export interface SidecarExecutionParams {
 	args: string[];
-	request: SidecarRequest;
+	request: BaseRequest;
 }
 
 /**
@@ -20,7 +21,7 @@ export class SidecarExecutor {
 	 * @param params - Параметры выполнения
 	 * @returns Результат выполнения команды
 	 */
-	static async execute<T extends SidecarResponse>(params: SidecarExecutionParams): Promise<T> {
+	static async execute<T = any>(params: SidecarExecutionParams): Promise<BaseResponse<T>> {
 		const command = Command.sidecar(this.SIDECAR_NAME, params.args);
 
 		let stdout = '';

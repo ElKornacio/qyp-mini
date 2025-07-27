@@ -1,99 +1,89 @@
-import { createInterface } from 'readline';
-import { SmartBuffer } from '@tiny-utils/bytes';
+import { BaseResponse, CommandHandler, IPCProtocol } from './ipc/index.js';
+import { CompileCommandHandler } from './request-handler/index.js';
+import { CompileRequest, CompileResult } from './types/index.js';
 
-async function compile(code: string) {
-	// Заглушка для компиляции кода
-	// TODO: Реализовать настоящую компиляцию TSX/React компонентов
-	return `// Компилированный код\n${code}`;
+/**
+ * Обработчик команды ping для проверки работоспособности
+ */
+async function handlePingCommand(request: { command: 'ping'; message?: string }): Promise<{ message: string }> {
+	const message = request.message || 'qYp-mini';
+	return { message: `pong, ${message}` };
 }
 
 /**
- * Обрабатывает JSON запрос от sidecar
- * @param {object} request - Декодированный JSON запрос
- * @returns {Promise<object>} - Ответ для sidecar
+ * Настройка и запуск приложения
  */
-async function processRequest(request: { command: string; code: string }) {
-	try {
-		switch (request.command) {
-			case 'compile':
-				if (!request.code) {
-					throw new Error('Отсутствует код для компиляции');
-				}
-				const compiledCode = await compile(request.code);
-				return {
-					status: 'success',
-					compiledCode: compiledCode,
-				};
+async function main(): Promise<void> {
+	// Инициализируем обработчики команд
+	const commandHandler = new CommandHandler();
+	const compileHandler = new CompileCommandHandler();
 
-			default:
-				throw new Error(`Неизвестная команда: ${request.command}`);
-		}
-	} catch (error) {
-		return {
-			status: 'error',
-			message: error instanceof Error ? error.message : String(error),
-		};
-	}
+	// Регистрируем команду compile
+	commandHandler.registerCommand<CompileRequest, CompileResult>('compile', async request => {
+		return await compileHandler.handle(request);
+	});
+
+	// Регистрируем команду ping (для тестирования через IPC)
+	commandHandler.registerCommand<{ command: 'ping'; message?: string }, { message: string }>(
+		'ping',
+		handlePingCommand,
+	);
+
+	// Запускаем обработку команд через stdin/stdout
+	await commandHandler.start();
 }
 
 /**
- * Отправляет ответ в stdout как JSON+base64+\n
- * @param {object} response - Объект ответа
+ * Показывает справку по использованию
  */
-function sendResponse(response: { status: string; message?: string; compiledCode?: string }) {
-	const jsonString = JSON.stringify(response);
-	const base64String = SmartBuffer.ofUTF8String(jsonString).toBase64String();
-	process.stdout.write(base64String + '\n');
+function showHelp(): void {
+	console.log(`
+qYp-mini Node.js Compiler Service
+
+Использование:
+  node index.js compile   - Запуск в режиме компиляции (основной режим)
+  node index.js ping      - Проверка работоспособности (простой режим)  
+  node index.js help      - Показать эту справку
+
+Режим компиляции:
+  Читает base64-encoded JSON запросы из stdin и возвращает результаты в stdout.
+  
+Формат запроса для compile:
+  {
+    "command": "compile",
+    "files": [
+      {
+        "path": "index.tsx",
+        "content": "import React from 'react'; ..."
+      }
+    ],
+    "options": {
+      "minify": false,
+      "sourcemap": true
+    }
+  }
+
+Формат запроса для ping:
+  {
+    "command": "ping",
+    "message": "test"
+  }
+`);
 }
 
-const command = process.argv[2];
+// Обработчики для некорректного завершения процесса
+process.on('uncaughtException', error => {
+	console.error('Необработанное исключение:', error);
+	process.exit(1);
+});
 
-switch (command) {
-	case 'compile':
-		// Читаем строки из stdin
-		const rl = createInterface({
-			input: process.stdin,
-			output: process.stdout,
-			terminal: false,
-		});
+process.on('unhandledRejection', (reason, promise) => {
+	console.error('Необработанное отклонение промиса:', reason);
+	process.exit(1);
+});
 
-		rl.on('line', async line => {
-			try {
-				// Декодируем base64
-				const jsonString = SmartBuffer.ofBase64String(line.trim()).toUTF8String();
-				// Парсим JSON
-				const request = JSON.parse(jsonString);
-
-				// Обрабатываем запрос
-				const response = await processRequest(request);
-
-				// Отправляем ответ
-				sendResponse(response);
-
-				// Завершаем процесс после обработки
-				process.exit(0);
-			} catch (error) {
-				console.error('Ошибка обработки запроса:', error);
-				sendResponse({
-					status: 'error',
-					message: `Ошибка декодирования запроса: ${error instanceof Error ? error.message : String(error)}`,
-				});
-				process.exit(1);
-			}
-		});
-
-		rl.on('close', () => {
-			// Завершение чтения stdin
-			process.exit(0);
-		});
-		break;
-
-	case 'ping':
-		const message = process.argv[3] || 'qYp-mini';
-		console.log(`pong, ${message}`);
-		break;
-
-	default:
-		console.error(`Неизвестная команда: ${command}`);
-		process.exit(1);
-}
+// Запуск приложения
+main().catch(error => {
+	console.error('Ошибка запуска:', error);
+	process.exit(1);
+});
