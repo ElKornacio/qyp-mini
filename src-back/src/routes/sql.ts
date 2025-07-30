@@ -14,7 +14,7 @@ const createDataSource = (credentials: DatabaseCredentials): DataSource => {
 		database: credentials.database,
 		synchronize: false,
 		logging: false,
-		ssl: credentials.ssl,
+		ssl: credentials.ssl ? { rejectUnauthorized: false } : false,
 	};
 
 	switch (credentials.type) {
