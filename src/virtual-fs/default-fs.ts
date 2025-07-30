@@ -13,26 +13,44 @@ import { buildShadcnUiFS } from './shadcn-ui';
  * │   ├── utils.ts       # readonly, здесь будут утилитарные функции аля `cn`
  */
 
-export const getDefaultWidgetIndexTsxContent = () => `import { Button } from  '@/components/ui/button';
+export const getDefaultWidgetIndexTsxContent = () => `import { useState, useEffect, useCallback } from 'react';
+import { Button } from  '@/components/ui/button';
+import fetchCustomersCount from '@/widget/query.sql';
 		
 export default function MyComponent() {
-  return (
-    <div className="p-4 bg-blue-100 dark:bg-blue-900 rounded-lg">
-      <h2 className="text-lg font-bold text-blue-800 dark:text-blue-200">Hello from Playground!</h2>
-      <p className="text-blue-600 dark:text-blue-300">Edit the code on the left to see changes here.</p>
-	  <Button>Click me!</Button>
-    </div>
-  );
+	const [customersCount, setCustomersCount] = useState(0);
+	const [loading, setLoading] = useState(false);
+
+	const reloadCustomersCount = useCallback(async () => {
+		setLoading(true);
+		const rows = await fetchCustomersCount();
+		setCustomersCount(rows.length > 0 ? rows[0].count : -1);
+		setLoading(false);
+	}, []);
+
+	useEffect(() => {
+		reloadCustomersCount();
+	}, [reloadCustomersCount]);
+
+	return (
+		<div className="w-full h-full p-4 bg-blue-100 dark:bg-blue-900 rounded-lg">
+			<h2 className="text-lg font-bold text-blue-800 dark:text-blue-200">Customers Count</h2>
+			<p className="text-blue-600 dark:text-blue-300 py-2 text-2xl">
+				{loading ? 'Loading...' : customersCount}
+			</p>
+			<Button onClick={reloadCustomersCount}>Reload</Button>
+		</div>
+	);
 }`;
 
 export const getDefaultWidgetQuerySqlTsContent = () => `import { runSql } from '@/lib/utils';
 
 /**
- * This function used to fetch users cound data from the database.
+ * This function used to fetch customers cound data from the database.
  */
 
-export default async function fetchUsersCount() {
-    return await runSql<{ count: number }[]>(\`SELECT COUNT(*) as count FROM users\`);
+export default async function fetchCustomersCount() {
+    return await runSql<{ count: number }[]>(\`SELECT COUNT(*) as count FROM customer\`);
 }
 `;
 

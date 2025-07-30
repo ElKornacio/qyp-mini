@@ -9,6 +9,7 @@
 		/* Bundler mode */
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
+		"experimentalDecorators": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"noEmit": true,

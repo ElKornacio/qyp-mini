@@ -1,6 +1,31 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* Скрытие скроллбара для горизонтального прокручивания вкладок */
+.scrollbar-hide {
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE 10+ */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+	display: none; /* WebKit */
+}
+
+/* Ограничение количества строк текста */
+.line-clamp-1 {
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.line-clamp-2 {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

@@ -1,34 +1,56 @@
-import { useState } from 'react';
+import React from 'react';
+import { observer } from 'mobx-react';
 import './App.css';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Welcome, Playground } from './pages';
+import { AppHeader } from './components/AppHeader';
+import { DashboardsList } from './components/DashboardsList';
+import { EmptyTab } from './components/EmptyTab';
+import { WelcomePage, PlaygroundPage, WidgetsLibraryPage, DatabasePage, DashboardPage } from './pages';
+import { appTabsStore } from './stores/AppTabsStore';
+// import { dashboardStore } from './stores/DashboardStore';
 
-function App() {
-	const [activeTab, setActiveTab] = useState('welcome');
+const App: React.FC = observer(() => {
+	const { activeTab } = appTabsStore;
+
+	// Функция для рендеринга контента вкладки
+	const renderTabContent = () => {
+		if (!activeTab) return <EmptyTab />;
+
+		switch (activeTab.type) {
+			case 'empty-tab':
+				return <EmptyTab />;
+
+			case 'dashboard-list':
+				return <DashboardsList />;
+
+			case 'dashboard':
+				return <DashboardPage dashboardId={activeTab.payload?.dashboardId || ''} />;
+
+			case 'database':
+				return <DatabasePage />;
+
+			case 'widgets-library':
+				return <WidgetsLibraryPage />;
+
+			case 'playground':
+				return <PlaygroundPage />;
+
+			case 'welcome':
+				return <WelcomePage />;
+
+			default:
+				return <EmptyTab />;
+		}
+	};
 
 	return (
 		<div className="dark h-screen flex flex-col bg-background text-foreground">
-			<Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-				{/* Панель табов в верхней части */}
-				<TabsList className="grid w-full grid-cols-3 h-12 bg-card">
-					<TabsTrigger value="welcome" className="text-sm font-medium">
-						Welcome
-					</TabsTrigger>
-					<TabsTrigger value="playground" className="text-sm font-medium">
-						Playground
-					</TabsTrigger>
-				</TabsList>
+			{/* Header с вкладками */}
+			<AppHeader />
 
-				{/* Контент табов */}
-				<TabsContent value="welcome" className="flex-1 m-0">
-					<Welcome />
-				</TabsContent>
-				<TabsContent value="playground" className="flex-1 m-0">
-					<Playground />
-				</TabsContent>
-			</Tabs>
+			{/* Основной контент */}
+			<div className="flex-1 overflow-hidden">{renderTabContent()}</div>
 		</div>
 	);
-}
+});
 
 export default App;

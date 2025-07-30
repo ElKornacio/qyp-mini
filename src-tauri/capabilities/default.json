@@ -10,6 +10,22 @@
 		"core:window:allow-center",
 		"opener:default",
 		"shell:allow-stdin-write",
-		"shell:default"
+		"shell:default",
+		"sql:default",
+		"sql:allow-execute",
+		"sql:allow-close",
+		"sql:allow-load",
+		"dialog:default",
+		"dialog:allow-confirm",
+		"fs:default",
+		"stronghold:default",
+		{
+			"identifier": "fs:scope",
+			"allow": [{ "path": "$APPDATA" }, { "path": "$APPDATA/**/*" }]
+		},
+		{
+			"identifier": "fs:allow-app-write-recursive",
+			"allow": [{ "path": "$APPDATA" }, { "path": "$APPDATA/**/*" }]
+		}
 	]
 }

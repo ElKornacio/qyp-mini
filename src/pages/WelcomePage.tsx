@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-export function Welcome() {
+export function WelcomePage() {
 	const [query, setQuery] = useState('');
 
 	const actionButtons = [
