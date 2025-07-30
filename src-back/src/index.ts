@@ -23,6 +23,8 @@ app.use(
 	}),
 );
 
+app.set('trust proxy', '127.0.0.1');
+
 // General rate limiting
 app.use(generalRateLimit);
 
