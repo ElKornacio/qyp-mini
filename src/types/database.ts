@@ -1,7 +1,7 @@
 import { DatabaseConnection } from '@/platform/abstract/database';
 
 /**
- * Интерфейс для подключения к базе данных PostgreSQL
+ * Интерфейс для подключения к базе данных
  */
 export interface DatabaseCredentials {
 	host: string;
@@ -9,6 +9,7 @@ export interface DatabaseCredentials {
 	database: string;
 	username: string;
 	password: string;
+	type: 'postgres' | 'mysql';
 	ssl?: boolean;
 }
 

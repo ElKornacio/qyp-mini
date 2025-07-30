@@ -34,6 +34,7 @@ export const DatabasePage: React.FC = observer(() => {
 					username: 'readonly',
 					password: 'AVNS_PHiKtaU9YG1vRyKWjGV',
 					database: 'pagila',
+					type: 'postgres',
 					ssl: true,
 				},
 			});

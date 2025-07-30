@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Database, DatabaseCredentials } from '@/types/database';
 import { databaseStore } from '@/stores/DatabaseStore';
 
@@ -24,6 +25,7 @@ const defaultFormData: DatabaseFormData = {
 	database: '',
 	username: '',
 	password: '',
+	type: 'postgres',
 	ssl: false,
 };
 
@@ -43,6 +45,7 @@ export const DatabaseFormModal: React.FC<DatabaseFormModalProps> = observer(({ o
 					database: database.credentials.database,
 					username: database.credentials.username,
 					password: database.credentials.password,
+					type: database.credentials.type,
 					ssl: database.credentials.ssl || false,
 				});
 			} else {
@@ -92,6 +95,7 @@ export const DatabaseFormModal: React.FC<DatabaseFormModalProps> = observer(({ o
 				database: formData.database,
 				username: formData.username,
 				password: formData.password,
+				type: formData.type,
 				ssl: formData.ssl,
 			};
 
@@ -150,6 +154,26 @@ export const DatabaseFormModal: React.FC<DatabaseFormModalProps> = observer(({ o
 							spellCheck={false}
 						/>
 						{errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+					</div>
+
+					{/* Тип БД */}
+					<div className="space-y-2">
+						<Label htmlFor="type">
+							Тип БД <span className="text-red-500">*</span>
+						</Label>
+						<Select
+							value={formData.type}
+							onValueChange={value => handleInputChange('type', value as 'postgres' | 'mysql' | 'sqlite')}
+						>
+							<SelectTrigger>
+								<SelectValue placeholder="Выберите тип базы данных" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="postgres">PostgreSQL</SelectItem>
+								<SelectItem value="mysql">MySQL</SelectItem>
+							</SelectContent>
+						</Select>
+						{errors.type && <p className="text-sm text-red-500">{errors.type}</p>}
 					</div>
 
 					{/* Хост и порт */}
