@@ -15,3 +15,6 @@
 - [Tauri](https://tauri.app/) + [Vite](https://vitejs.dev/) + [React](https://react.dev/) + [Typescript](https://www.typescriptlang.org/)
 - [Tailwind](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
 - [Cursor](https://www.cursor.com/) + [Supercode.sh](https://supercode.sh/)
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTE4NTg4NjU3MF19
+-->
