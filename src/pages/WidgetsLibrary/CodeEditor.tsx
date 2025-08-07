@@ -1,12 +1,98 @@
 import { observer } from 'mobx-react';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { widgetsLibraryStore } from '@/stores/WidgetsLibrary';
 import { Save, RefreshCw } from 'lucide-react';
+import Editor, { OnMount } from '@monaco-editor/react';
+import {
+	ensureMonacoWorkers,
+	applyDefaultDarkTheme,
+	configureTypescript,
+	registerReactTypings,
+	registerProjectVirtualTypings,
+} from '@/lib/monaco/setup';
+import { useEffect, useRef } from 'react';
 
 export const CodeEditor = observer(() => {
+	// Настраиваем воркеры Monaco один раз
+	ensureMonacoWorkers();
+
+	// Список добавленных дополнительных typings, чтобы корректно очищать при размонтировании
+	const extraLibDisposablesRef = useRef<any[] | null>(null);
+
+	// Настройка Monaco после монтирования редактора
+	const handleEditorMount: OnMount = (editor, monaco) => {
+		// Включаем автоподстройку размера редактора
+		editor.updateOptions({ automaticLayout: true });
+
+		// Тема
+		applyDefaultDarkTheme(monaco);
+
+		// TypeScript опции
+		configureTypescript(monaco);
+
+		// Регистрация полных типов и внутренних d.ts
+		const extraLibDisposables: any[] = [];
+		extraLibDisposables.push(...registerReactTypings(monaco));
+		extraLibDisposables.push(...registerProjectVirtualTypings(monaco));
+
+		// 4) Типинги для виртуальных модулей проекта
+		const uiButtonDts = [
+			"declare module '@/components/ui/button' {",
+			"  import React from 'react';",
+			'  export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}',
+			'  export const Button: React.FC<ButtonProps>;',
+			'  export default Button;',
+			'}',
+		].join('\n');
+		extraLibDisposables.push(
+			monaco.languages.typescript.typescriptDefaults.addExtraLib(
+				uiButtonDts,
+				'ts:virtual/@/components/ui/button.d.ts',
+			),
+		);
+
+		const utilsDts = [
+			"declare module '@/lib/utils' {",
+			'  export function runSql<T = any>(query: string): Promise<T>;',
+			'}',
+		].join('\n');
+		extraLibDisposables.push(
+			monaco.languages.typescript.typescriptDefaults.addExtraLib(utilsDts, 'ts:virtual/@/lib/utils.d.ts'),
+		);
+
+		const querySqlDts = [
+			"declare module '@/widget/query.sql' {",
+			'  const fn: <T = any>() => Promise<T>;',
+			'  export default fn;',
+			'}',
+		].join('\n');
+		extraLibDisposables.push(
+			monaco.languages.typescript.typescriptDefaults.addExtraLib(
+				querySqlDts,
+				'ts:virtual/@/widget/query.sql.d.ts',
+			),
+		);
+
+		// Сохраняем disposables для очистки при размонтировании
+		extraLibDisposablesRef.current = extraLibDisposables;
+	};
+
+	// Чистим добавленные extraLibs при размонтировании компонента
+	useEffect(() => {
+		return () => {
+			if (extraLibDisposablesRef.current) {
+				for (const d of extraLibDisposablesRef.current) {
+					try {
+						d?.dispose?.();
+					} catch (_) {}
+				}
+				extraLibDisposablesRef.current = null;
+			}
+		};
+	}, []);
+
 	return (
-		<div className="h-full flex flex-col p-4 flex-1">
+		<div className="h-full flex flex-col p-4 flex-1 min-h-0">
 			{/* Заголовок и панель управления */}
 			<div className="flex items-center justify-between mb-4">
 				<h3 className="font-medium">Исходный код</h3>
@@ -61,13 +147,36 @@ export const CodeEditor = observer(() => {
 				</div>
 			) : null}
 
-			{/* Текстовая область для кода */}
-			<Textarea
-				value={widgetsLibraryStore.widgetTsx}
-				onChange={e => (widgetsLibraryStore.widgetTsx = e.target.value)}
-				placeholder="Введите код React компонента..."
-				className="flex-1 h-full font-mono text-sm resize-none"
-			/>
+			{/* Monaco Editor */}
+			<div className="flex-1 min-h-0 border rounded">
+				<Editor
+					height="100%"
+					language="typescript"
+					path="Widget.tsx"
+					theme="vs-dark"
+					value={widgetsLibraryStore.widgetTsx}
+					onChange={value => {
+						// Безопасно обновляем стор даже при undefined
+						widgetsLibraryStore.widgetTsx = value ?? '';
+					}}
+					onMount={handleEditorMount}
+					options={{
+						fontFamily:
+							'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+						fontSize: 13,
+						minimap: { enabled: false },
+						wordWrap: 'on',
+						tabSize: 2,
+						insertSpaces: true,
+						renderWhitespace: 'selection',
+						scrollBeyondLastLine: false,
+						smoothScrolling: true,
+						occurrencesHighlight: 'singleFile',
+						contextmenu: true,
+						automaticLayout: true,
+					}}
+				/>
+			</div>
 		</div>
 	);
 });
